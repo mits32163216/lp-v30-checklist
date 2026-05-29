@@ -1,7 +1,7 @@
 /* v30 LPファイナル修正チェックリスト Service Worker
  * アプリシェルをキャッシュしてオフライン起動を可能にする。
  * チェック状態は localStorage（SWの管轄外）に保存される。 */
-const CACHE = 'lp-v30-checklist-v1';
+const CACHE = 'lp-v30-checklist-v2';
 const SHELL = [
   './',
   './index.html',
