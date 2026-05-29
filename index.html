@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#3b5bdb">
-  <meta name="description" content="UTAGE商品販売設定フローの作業チェックリスト。">
-  <title>UTAGE商品販売設定フロー</title>
+  <meta name="description" content="v30 LPファイナル修正チェックリスト（AI自動判定・全26件）">
+  <title>v30 LPファイナル修正チェックリスト</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -289,7 +289,7 @@
 
 <!-- STICKY HEADER -->
 <header id="app-header">
-  <h1>UTAGE商品販売<br>設定フロー</h1>
+  <h1>v30 LP<br>修正チェックリスト</h1>
   <div id="progress-ring-wrap">
     <svg id="progress-ring" viewBox="0 0 40 40">
       <circle class="bg" cx="20" cy="20" r="17"/>
@@ -298,7 +298,7 @@
     </svg>
     <div id="progress-text">
       <span class="count" id="count-done">0</span>
-      <span>/ <span id="count-total">49</span></span>
+      <span>/ <span id="count-total">26</span></span>
     </div>
   </div>
   <button id="reset-btn" onclick="confirmReset()">リセット</button>
@@ -306,14 +306,14 @@
 
 <main id="main">
   <div id="completion-banner">
-    <h2>🎉 全ステップ完了！</h2>
-    <p>UTAGE商品販売設定フローが完了しました。お疲れさまでした！</p>
+    <h2>🎉 全26件確認完了！</h2>
+    <p>v30 LPファイナル修正チェックリストを確認しました。</p>
   </div>
   <div id="loading">読み込み中...</div>
 </main>
 
 <script>
-const STORAGE_KEY = 'utage-checklist-progress';
+const STORAGE_KEY = 'lp-v30-checklist-progress';
 let stepsData = null;
 let checkedIds = new Set();
 
@@ -343,7 +343,7 @@ function confirmReset() {
 
 // ===== PROGRESS RING =====
 function updateProgress() {
-  const total = stepsData ? stepsData.totalSteps : 49;
+  const total = stepsData ? stepsData.totalSteps : 26;
   const done = checkedIds.size;
   document.getElementById('count-done').textContent = done;
   document.getElementById('count-total').textContent = total;
@@ -385,7 +385,7 @@ function renderAll() {
   const done = checkedIds.size;
   const total = stepsData.totalSteps;
   if (done === total && total > 0) banner.classList.add('visible');
-  banner.innerHTML = '<h2>🎉 全ステップ完了！</h2><p>UTAGE商品販売設定フローが完了しました。お疲れさまでした！</p>';
+  banner.innerHTML = '<h2>🎉 全26件確認完了！</h2><p>v30 LPファイナル修正チェックリストを確認しました。</p>';
   main.appendChild(banner);
 
   stepsData.sections.forEach((section) => {
@@ -409,7 +409,7 @@ function renderAll() {
     header.addEventListener('click', () => {
       card.classList.toggle('collapsed');
       // store collapse state
-      const colKey = 'utage-checklist-collapsed';
+      const colKey = 'lp-v30-checklist-collapsed';
       let colSet = new Set();
       try { colSet = new Set(JSON.parse(localStorage.getItem(colKey) || '[]')); } catch {}
       if (card.classList.contains('collapsed')) {
@@ -453,7 +453,7 @@ function renderAll() {
       list.style.maxHeight = list.scrollHeight + 'px';
       // Restore collapsed state
       try {
-        const colSet = new Set(JSON.parse(localStorage.getItem('utage-checklist-collapsed') || '[]'));
+        const colSet = new Set(JSON.parse(localStorage.getItem('lp-v30-checklist-collapsed') || '[]'));
         if (colSet.has(section.id)) {
           card.classList.add('collapsed');
         }
@@ -475,6 +475,16 @@ async function init() {
   } catch (e) {
     document.getElementById('loading').textContent = 'データの読み込みに失敗しました。ページを再読み込みしてください。';
     return;
+  }
+  // 初回起動時（localStorage 未初期化）に pre_checked: true を自動チェック
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    stepsData.sections.forEach(section => {
+      section.steps.forEach(step => {
+        if (step.pre_checked) checkedIds.add(step.id);
+      });
+    });
+    saveProgress();
   }
   renderAll();
 }

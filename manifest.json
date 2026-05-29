@@ -1,6 +1,6 @@
 {
-  "name": "UTAGE商品販売設定フロー",
-  "short_name": "UTAGEチェック",
+  "name": "v30 LPファイナル修正チェックリスト",
+  "short_name": "LP v30",
   "lang": "ja",
   "dir": "ltr",
   "start_url": "./index.html",
@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "background_color": "#f0f4ff",
   "theme_color": "#3b5bdb",
-  "description": "UTAGE商品販売設定フローの作業チェックリスト。",
+  "description": "v30 LPファイナル修正チェックリスト（AI自動判定・全26件）",
   "categories": ["productivity", "business"],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
