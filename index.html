@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3b5bdb">
+  <meta name="description" content="UTAGE商品販売設定フローの作業チェックリスト。">
+  <title>UTAGE商品販売設定フロー</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #3b5bdb;
+      --primary-dark: #2f4ac7;
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #555577;
+      --border: #dde3f8;
+      --done-bg: #f5f7ff;
+      --done-text: #999;
+      --badge-done: #2f9e44;
+      --badge-done-bg: #d3f9d8;
+      --shadow: 0 2px 8px rgba(59,91,219,0.08);
+      --gap: 20px;
+      --gap-sm: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* ===== STICKY HEADER ===== */
+    #app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px var(--gap);
+      display: flex;
+      align-items: center;
+      gap: var(--gap-sm);
+      box-shadow: 0 2px 12px rgba(59,91,219,0.25);
+    }
+
+    #app-header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    #progress-ring-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    #progress-ring {
+      width: 40px;
+      height: 40px;
+      transform: rotate(-90deg);
+    }
+
+    #progress-ring .bg { fill: none; stroke: rgba(255,255,255,0.25); stroke-width: 3; }
+    #progress-ring .fg { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+
+    #progress-text {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    #progress-text .count { font-size: 18px; display: block; }
+
+    #reset-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: #fff;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    #reset-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* ===== MAIN CONTENT ===== */
+    #main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: var(--gap);
+    }
+
+    /* ===== SECTION CARD ===== */
+    .section-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: var(--gap);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px var(--gap);
+      cursor: pointer;
+      user-select: none;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .section-header:hover { background: #f8f9ff; }
+
+    .section-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .section-counter {
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg);
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .badge-done {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--badge-done);
+      background: var(--badge-done-bg);
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .chevron {
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+    .section-card.collapsed .chevron { transform: rotate(-90deg); }
+
+    .steps-list {
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .section-card.collapsed .steps-list { max-height: 0 !important; }
+
+    /* ===== STEP ITEM ===== */
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px var(--gap);
+      border-bottom: 1px solid var(--border);
+      min-height: 44px;
+      transition: background 0.15s, opacity 0.2s;
+      cursor: pointer;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-item:hover { background: #fafbff; }
+
+    .step-item.done {
+      background: var(--done-bg);
+      opacity: 0.55;
+    }
+
+    .step-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      flex-shrink: 0;
+      cursor: pointer;
+      margin-top: 1px;
+      background: #fff;
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .step-checkbox:checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .step-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 6px;
+      width: 6px; height: 10px;
+      border: 2px solid #fff;
+      border-top: none; border-left: none;
+      transform: rotate(40deg);
+    }
+
+    .step-body {
+      flex: 1;
+      pointer-events: none;
+    }
+
+    .step-num {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      display: block;
+    }
+    .done .step-title { text-decoration: line-through; color: var(--done-text); }
+
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.5;
+      display: block;
+    }
+    .done .step-desc { color: var(--done-text); }
+
+    /* ===== LOADING / ERROR ===== */
+    #loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* ===== COMPLETION BANNER ===== */
+    #completion-banner {
+      display: none;
+      background: linear-gradient(135deg, #2f9e44, #37b24d);
+      color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: var(--gap);
+      box-shadow: 0 4px 16px rgba(47,158,68,0.25);
+    }
+    #completion-banner.visible { display: block; }
+    #completion-banner h2 { font-size: 18px; margin-bottom: 4px; }
+    #completion-banner p { font-size: 13px; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<header id="app-header">
+  <h1>UTAGE商品販売<br>設定フロー</h1>
+  <div id="progress-ring-wrap">
+    <svg id="progress-ring" viewBox="0 0 40 40">
+      <circle class="bg" cx="20" cy="20" r="17"/>
+      <circle class="fg" id="ring-fg" cx="20" cy="20" r="17"
+        stroke-dasharray="106.8" stroke-dashoffset="106.8"/>
+    </svg>
+    <div id="progress-text">
+      <span class="count" id="count-done">0</span>
+      <span>/ <span id="count-total">49</span></span>
+    </div>
+  </div>
+  <button id="reset-btn" onclick="confirmReset()">リセット</button>
+</header>
+
+<main id="main">
+  <div id="completion-banner">
+    <h2>🎉 全ステップ完了！</h2>
+    <p>UTAGE商品販売設定フローが完了しました。お疲れさまでした！</p>
+  </div>
+  <div id="loading">読み込み中...</div>
+</main>
+
+<script>
+const STORAGE_KEY = 'utage-checklist-progress';
+let stepsData = null;
+let checkedIds = new Set();
+
+// ===== localStorage =====
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      checkedIds = new Set(parsed.checkedIds || []);
+    }
+  } catch (e) { checkedIds = new Set(); }
+}
+
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ checkedIds: Array.from(checkedIds) }));
+}
+
+// ===== RESET =====
+function confirmReset() {
+  if (confirm('チェック状態をすべてリセットしますか？')) {
+    checkedIds.clear();
+    saveProgress();
+    renderAll();
+  }
+}
+
+// ===== PROGRESS RING =====
+function updateProgress() {
+  const total = stepsData ? stepsData.totalSteps : 49;
+  const done = checkedIds.size;
+  document.getElementById('count-done').textContent = done;
+  document.getElementById('count-total').textContent = total;
+
+  const r = 17;
+  const circ = 2 * Math.PI * r;
+  const pct = total > 0 ? done / total : 0;
+  document.getElementById('ring-fg').style.strokeDashoffset = circ * (1 - pct);
+
+  // Completion banner
+  const banner = document.getElementById('completion-banner');
+  if (done === total && total > 0) {
+    banner.classList.add('visible');
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+
+// ===== TOGGLE STEP =====
+function toggleStep(id) {
+  if (checkedIds.has(id)) {
+    checkedIds.delete(id);
+  } else {
+    checkedIds.add(id);
+  }
+  saveProgress();
+  renderAll();
+}
+
+// ===== RENDER =====
+function renderAll() {
+  if (!stepsData) return;
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+
+  // Completion banner
+  const banner = document.createElement('div');
+  banner.id = 'completion-banner';
+  const done = checkedIds.size;
+  const total = stepsData.totalSteps;
+  if (done === total && total > 0) banner.classList.add('visible');
+  banner.innerHTML = '<h2>🎉 全ステップ完了！</h2><p>UTAGE商品販売設定フローが完了しました。お疲れさまでした！</p>';
+  main.appendChild(banner);
+
+  stepsData.sections.forEach((section) => {
+    const sectionDone = section.steps.filter(s => checkedIds.has(s.id)).length;
+    const sectionTotal = section.steps.length;
+    const allDone = sectionDone === sectionTotal;
+
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.dataset.sectionId = section.id;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = `
+      <span class="section-num">${section.id}</span>
+      <span class="section-title">${section.title}</span>
+      ${allDone ? '<span class="badge-done">完了</span>' : `<span class="section-counter">${sectionDone}/${sectionTotal}</span>`}
+      <span class="chevron">▼</span>
+    `;
+    header.addEventListener('click', () => {
+      card.classList.toggle('collapsed');
+      // store collapse state
+      const colKey = 'utage-checklist-collapsed';
+      let colSet = new Set();
+      try { colSet = new Set(JSON.parse(localStorage.getItem(colKey) || '[]')); } catch {}
+      if (card.classList.contains('collapsed')) {
+        colSet.add(section.id);
+      } else {
+        colSet.delete(section.id);
+      }
+      localStorage.setItem(colKey, JSON.stringify(Array.from(colSet)));
+    });
+    card.appendChild(header);
+
+    // Steps list
+    const list = document.createElement('div');
+    list.className = 'steps-list';
+
+    section.steps.forEach((step) => {
+      const isDone = checkedIds.has(step.id);
+      const item = document.createElement('div');
+      item.className = 'step-item' + (isDone ? ' done' : '');
+      item.innerHTML = `
+        <input type="checkbox" class="step-checkbox" ${isDone ? 'checked' : ''} aria-label="${step.title}">
+        <div class="step-body">
+          <span class="step-num">STEP ${step.id}</span>
+          <span class="step-title">${step.title}</span>
+          <span class="step-desc">${step.description}</span>
+        </div>
+      `;
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleStep(step.id);
+      });
+      list.appendChild(item);
+    });
+
+    // Set natural height for animation
+    card.appendChild(list);
+    main.appendChild(card);
+
+    // After append: measure height and set max-height
+    requestAnimationFrame(() => {
+      list.style.maxHeight = list.scrollHeight + 'px';
+      // Restore collapsed state
+      try {
+        const colSet = new Set(JSON.parse(localStorage.getItem('utage-checklist-collapsed') || '[]'));
+        if (colSet.has(section.id)) {
+          card.classList.add('collapsed');
+        }
+      } catch {}
+    });
+  });
+
+  updateProgress();
+}
+
+// ===== INIT =====
+async function init() {
+  loadProgress();
+  try {
+    const res = await fetch('./steps.json');
+    if (!res.ok) throw new Error('fetch failed');
+    stepsData = await res.json();
+    document.getElementById('loading').remove();
+  } catch (e) {
+    document.getElementById('loading').textContent = 'データの読み込みに失敗しました。ページを再読み込みしてください。';
+    return;
+  }
+  renderAll();
+}
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+init();
+</script>
+</body>
+</html>
