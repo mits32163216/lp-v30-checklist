@@ -465,18 +465,16 @@ function renderAll() {
   updateProgress();
 }
 
+// ===== STEPS DATA（直書き・fetch廃止） =====
+const STEPS_DATA = {"workflow":"v30 LPファイナル修正チェックリスト","totalSteps":26,"sections":[{"id":1,"title":"AI判定可能・確認OK（24件）","steps":[{"id":1,"title":"[A1] そんな心配","description":"L180: 「そんな心配は完全に無用です。」確認。「それら心配」の残存なし","pre_checked":true},{"id":2,"title":"[A2] つなぎ込み","description":"L209: 「戦略と会社経営の、つなぎ込み」確認。「接続つなぎ込み」の残存なし","pre_checked":true},{"id":3,"title":"[A3] MCP説明付き","description":"L355: 「MCP（AIとツールをつなぐ接続規格）」確認","pre_checked":true},{"id":4,"title":"[A4] 百時間 → 削除済み","description":"「百時間」の残存なし。「100時間」に統一済み","pre_checked":true},{"id":5,"title":"[A5] 2,000時間 → 統一済み","description":"L522/L524/L532に「2,000時間」確認。カンマなし「2000時間」の残存なし","pre_checked":true},{"id":6,"title":"[A6] 半年 → 統一済み","description":"L200/L204/L211/L215/L363/L634に「半年」確認。「2年後」「2年間」の残存なし","pre_checked":true},{"id":7,"title":"[A7] F1-08 → 全削除済み","description":"「F1-08」の残存なし。5箇所削除完了","pre_checked":true},{"id":8,"title":"[A8] F1-07 → 混同なし","description":"「F1-07」の残存なし。F1-08削除後も混在ゼロ","pre_checked":true},{"id":9,"title":"[A9] 21体 → 削除済み","description":"「21体」の残存なし。25体に統一済み","pre_checked":true},{"id":10,"title":"[A10] AI社員 → 削除済み","description":"「AI社員」の残存なし。「AIスタッフ」に統一済み","pre_checked":true},{"id":11,"title":"[A11] 8人体制 → 削除済み","description":"「8人体制」の残存なし。L441: 「常時8〜10体」表現に更新済み","pre_checked":true},{"id":12,"title":"[A12] 800時間 → 存在確認","description":"L436/L441/L610に「累計800時間」確認（3箇所）","pre_checked":true},{"id":13,"title":"[A13] 月に20本/60本 → 削除済み","description":"「月に20本」「60本」の残存なし","pre_checked":true},{"id":14,"title":"[A14] 奨学金 → 全廃済み","description":"「奨学金」の残存ゼロ。廃止確認","pre_checked":true},{"id":15,"title":"[A15] Maxプラン契約 → 明示済み","description":"L474/L484/L490/L491/L492/L578/L633に「Claude Code Maxプラン契約」確認","pre_checked":true},{"id":16,"title":"[A16] ¥110,000（2ヶ月）→ 存在確認","description":"L485: 「10万円＋税（税込 ¥110,000）」/ L579同記載","pre_checked":true},{"id":17,"title":"[A17] ¥132,000（3ヶ月）→ 存在確認","description":"L486: 「12万円＋税（税込 ¥132,000）」/ L580同記載","pre_checked":true},{"id":18,"title":"[A18] FAQ 3件構成 → 確認","description":"faq-item が L417/L421/L425 の3箇所。3件構成確定","pre_checked":true},{"id":19,"title":"[A19] d32f2f 赤色 → 確認","description":"L462/L468/L472に color:#d32f2f 確認。小見出し3本すべて適用済み","pre_checked":true},{"id":20,"title":"[A20] 小見出し①「世界・国内の相場」→ 確認","description":"L462: 「世界・国内の相場、いくらか知っていますか？」","pre_checked":true},{"id":21,"title":"[A22] 小見出し③「ゼロ期だけの特別価格」→ 確認","description":"L472: 「ゼロ期だけの特別価格と、たったひとつの条件。」","pre_checked":true},{"id":22,"title":"[A23] 3ヶ月プラン/12万 → P.P.P.S.整合確認","description":"L476/L483/L486/L580に「3ヶ月プラン」と「12万円＋税」確認","pre_checked":true},{"id":23,"title":"[A24] 講座修了時点 → P.P.P.S.更新確認","description":"L634: 「これが、講座修了時点の、最初のゴールです。」確認","pre_checked":true},{"id":24,"title":"[Q2] 「ある条件」→ 消去確認・整合確認","description":"「ある条件」残存ゼロ。L484に「Claude Code Maxプラン契約（月100ドル・自費）必須／Pro・無料プラン不可」として明示化済み","pre_checked":true}]},{"id":2,"title":"Mits判定済み（2件）","steps":[{"id":25,"title":"[A21] 小見出し②の文言（Mits判定済み）","description":"実物L468: 「今回のAIエージェント講座、20万円としました。」。Mits判定 2026-05-29: 現状維持OK・実物の表現で確定","pre_checked":true},{"id":26,"title":"[Q1] 「2ヶ月グルコン」3箇所残存（Mits判定済み）","description":"L6 title / L174 header-pre / L453 bar-subの3箇所に残存。Mits判定 2026-05-29: 現状維持・3箇所そのまま据え置き","pre_checked":true}]}]};
+
 // ===== INIT =====
-async function init() {
+function init() {
   loadProgress();
-  try {
-    const res = await fetch('./steps.json');
-    if (!res.ok) throw new Error('fetch failed');
-    stepsData = await res.json();
-    document.getElementById('loading').remove();
-  } catch (e) {
-    document.getElementById('loading').textContent = 'データの読み込みに失敗しました。ページを再読み込みしてください。';
-    return;
-  }
+  stepsData = STEPS_DATA;
+  // loading要素を削除
+  const loadingEl = document.getElementById('loading');
+  if (loadingEl) loadingEl.remove();
   // 初回起動時（localStorage 未初期化）に pre_checked: true を自動チェック
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -490,11 +488,10 @@ async function init() {
   renderAll();
 }
 
-// ===== SERVICE WORKER =====
+// ===== SERVICE WORKER（無効化・既存SW/キャッシュをunregister） =====
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
 }
 
 init();
